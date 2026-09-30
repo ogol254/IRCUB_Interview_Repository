@@ -1,0 +1,1 @@
+CREATE TABLE payment_processing_log(request_key text NOT NULL REFERENCES idempotency_record(key),item_index int NOT NULL,result jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(request_key,item_index));

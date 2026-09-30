@@ -1,0 +1,6 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>IRCUB Payment Capture</title>
+<style>body{font-family:Arial;max-width:900px;margin:auto;padding:24px}input,select,button{font-size:18px;padding:12px;margin:6px;min-height:44px}.step{border:1px solid #ccc;padding:18px;margin:12px 0}.error{color:#a00}@media(max-width:700px){input,select,button{width:100%;box-sizing:border-box}}</style></head>
+<body><h1>Payment Capture</h1><p>Tablet-friendly three-step reference UI. Server-side validation remains authoritative.</p>
+<section class="step"><h2>1. Payer & Revenue</h2><input aria-label="payer search" placeholder="TIN, phone or water account"><button>Search</button><select><option>Business Licence</option><option>Water</option></select></section>
+<section class="step"><h2>2. Payment Lines</h2><input type="number" min="0.01" step="0.01" placeholder="Amount" required><select><option>BANK</option><option>MOBILE_MONEY</option><option>CASH</option></select><input placeholder="External reference" required><button>+ Add line</button></section>
+<section class="step"><h2>3. Confirmation</h2><p>Summary, validation errors and receipt reference appear after successful server submission.</p><button onclick="window.print()">Print Receipt</button></section></body></html>

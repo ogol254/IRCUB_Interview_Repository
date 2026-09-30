@@ -1,0 +1,44 @@
+flowchart TB
+  subgraph external["External trust boundary"]
+    ui["Web and tablet UI"]
+    idp["OIDC identity provider"]
+    bank["Bank and mobile money"]
+    gateway["SMS and email gateway"]
+    fmis["FMIS"]
+  end
+  subgraph application["IRCUB application boundary - proposed modular system"]
+    api["API - authentication and authorisation"]
+    registry["Payer registry"]
+    billing["Billing and assessments"]
+    payment["Payment verification and allocation"]
+    compliance["Compliance engine and rule versions"]
+    work["Work order service"]
+    notify["Notification worker"]
+    journal["FMIS journal worker"]
+  end
+  subgraph private["Private data and operations boundary"]
+    db[("PostgreSQL ledger and transactional outbox")]
+    redis[("Redis report cache")]
+    audit["Protected audit export and observability"]
+  end
+  ui -->|"HTTPS with access token"| api
+  api -->|"Validate issuer and signing keys"| idp
+  bank -->|"Signed idempotent callback"| api
+  api --> registry
+  api --> billing
+  api --> payment
+  api --> work
+  compliance -->|"Read unpaid obligations"| billing
+  compliance -->|"Contact details"| registry
+  payment -->|"Balance and cancellation transaction"| db
+  work --> db
+  compliance --> db
+  registry --> db
+  billing --> db
+  db -->|"Durable job claims"| notify
+  db -->|"Unposted batch claims"| journal
+  notify -->|"Notice and delivery receipts"| gateway
+  journal -->|"Stable batch key and reference"| fmis
+  api -->|"Derived reports only"| redis
+  api --> audit
+  db -->|"Audit evidence export"| audit

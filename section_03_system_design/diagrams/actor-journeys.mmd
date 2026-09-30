@@ -1,0 +1,16 @@
+flowchart LR
+  subgraph payerJourney["Payer"]
+    p1["Receive notice"] --> p2["Review debt securely"] --> p3["Pay or request plan"] --> p4["Receive confirmation"] --> p5["Enforcement stopped if eligible"]
+  end
+  subgraph officerJourney["Compliance officer"]
+    c1["Open assigned cases"] --> c2["Review debt and notices"] --> c3["Contact payer and record action"] --> c4["Follow up and resolve"]
+  end
+  subgraph auditorJourney["Auditor"]
+    a1["Open escalation"] --> a2["Inspect policy and evidence"] --> a3["Review decisions and allocations"] --> a4["Export findings"]
+  end
+  subgraph adminJourney["Administrator"]
+    r1["Review approved policy"] --> r2["Configure validated rules"] --> r3["Publish effective version"] --> r4["Monitor outcomes"]
+  end
+  subgraph fieldJourney["Water field officer"]
+    w1["Receive assignment"] --> w2["Check current eligibility"] --> w3["Visit and record evidence"] --> w4["Close valid order"]
+  end

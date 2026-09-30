@@ -1,0 +1,10 @@
+flowchart LR
+  payer["Person or business"] --> debt["Tax debt or water bill"]
+  debt --> case["Overdue case"]
+  case --> notice["Notice and delivery evidence"]
+  case --> officer["Officer review"]
+  case --> plan["Approved payment agreement"]
+  case --> work["Field work order"]
+  pay["Settled payment"] --> debt
+  pay --> fmis["Government financial record"]
+  case --> audit["Audit evidence"]

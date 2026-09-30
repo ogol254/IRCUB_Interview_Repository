@@ -1,0 +1,12 @@
+flowchart TB
+  notice["Customer receives disconnection notice"] --> review["Opens secure link and reviews current debt"]
+  review --> pay["Pays in full through mobile money"]
+  pay --> verify["IRCUB verifies settled payment"]
+  verify --> clear["Debt cleared and pending work order cancelled"]
+  clear --> customer["Customer and field officer receive confirmation"]
+  clear --> journal["Balanced government journal created"]
+  journal --> fmis["FMIS accepts journal and returns reference"]
+  fmis --> reconcile["Compare provider, IRCUB and FMIS records"]
+  verify -->|"Partial or unverified payment"| exception["Keep case open and explain remaining balance"]
+  clear -->|"Already disconnected"| reconnect["Reconnection review and new field order"]
+  journal -->|"Posting unavailable"| retry["Safe retry or manual review - debt remains paid"]

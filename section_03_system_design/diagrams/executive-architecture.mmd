@@ -1,0 +1,8 @@
+flowchart LR
+  payer["Payer"] -->|"Pays using notice reference"| bank["Bank or mobile money"]
+  bank -->|"Settled collection"| ircub["IRCUB revenue and compliance"]
+  ircub -->|"Debt notice and confirmation"| notify["SMS and email"]
+  notify --> payer
+  ircub -->|"Balanced government journal"| fmis["FMIS"]
+  ircub -->|"Assign or cancel field action"| field["Water field officer"]
+  oversight["Ministry officers and auditors"] -->|"Rules and oversight"| ircub

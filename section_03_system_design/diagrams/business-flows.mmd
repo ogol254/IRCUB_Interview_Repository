@@ -1,0 +1,19 @@
+flowchart LR
+  subgraph flow1["1 - Debt over 60 days"]
+    debt["Unpaid debt is 61 days old"] --> check["Recheck balance"] --> create["Create case once"] --> notice["Send SMS and email"]
+  end
+  subgraph flow2["2 - Tax over 90 days"]
+    tax["Tax debt is 91 days old"] --> escalate["Assign compliance officer"] --> auditor["Auditor reviews evidence"]
+  end
+  subgraph flow3["3 - Water enforcement"]
+    water["Deliver disconnection notice"] --> wait["Wait approved notice period"] --> recheck["Check debt and holds"] --> order["Assign field order"]
+  end
+  subgraph flow4["4 - Approved plan"]
+    propose["Propose instalments"] --> approve["Independent approval"] --> pause["Pause enforcement"]
+  end
+  subgraph flow5["5 - Plan default"]
+    miss["Instalment missed after grace"] --> settled["Check settled payments"] --> resume["Resume enforcement and notify"]
+  end
+  subgraph flow6["6 - Full payment"]
+    receive["Receive water notice"] --> mobile["Pay via mobile money"] --> verified["Verify and allocate payment"] --> clear["Clear debt and cancel pending order"] --> journal["Post balanced FMIS journal"] --> reconcile["Reconcile and confirm"]
+  end

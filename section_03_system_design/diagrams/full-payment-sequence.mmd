@@ -1,0 +1,32 @@
+sequenceDiagram
+  actor payer as Payer
+  participant provider as Mobile money
+  participant api as Payment API
+  participant db as Ledger and enforcement
+  participant worker as Outbox and journal workers
+  participant field as Field officer
+  participant fmis as FMIS
+  payer->>api: Open secure link and refresh debt quote
+  api-->>payer: Current amount and payment reference
+  payer->>provider: Authorise full payment
+  provider->>api: Settled callback with HMAC, time and key
+  api->>api: Verify authentication and replay controls
+  api->>db: Lock obligation, account and work order
+  api->>db: Allocate once, clear debt, cancel pending order
+  api->>db: Append audit and outbox events in same transaction
+  db-->>api: Commit
+  api-->>provider: Stored payment result
+  worker->>db: Claim committed notification and cancellation events
+  worker->>field: Cancel order or request reconnection review
+  worker-->>payer: Payment receipt and enforcement status
+  worker->>db: Persist balanced batch and immutable payment membership
+  worker->>fmis: POST journal with stable batch ID
+  alt Accepted and response received
+    fmis-->>worker: FMIS reference
+  else Accepted but response timed out
+    worker->>fmis: Retry same batch or lookup reference
+    fmis-->>worker: Same reference, no second journal
+  else Permanent failure or attempts exhausted
+    worker->>db: FAILED with owner for manual review
+  end
+  worker->>db: Store reference and compare settlement, ledger and GL totals

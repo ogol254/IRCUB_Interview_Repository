@@ -1,0 +1,1 @@
+{"water_tariff":{"service_charge":"200","bands":[{"upper_limit":"10","rate":"50"},{"upper_limit":"30","rate":"75"},{"upper_limit":null,"rate":"110"}]},"workers":4,"queue_capacity":128,"report_ttl":60,"collection_gl":"1000"}

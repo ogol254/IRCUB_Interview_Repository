@@ -1,0 +1,87 @@
+erDiagram
+  PAYER ||--o{ ASSESSMENT : owes
+  PAYER ||--o{ WATER_ACCOUNT : owns
+  WATER_ACCOUNT ||--o{ ASSESSMENT : billed
+  PAYER ||--o{ PAYMENT : pays
+  PAYMENT ||--o{ PAYMENT_ALLOCATION : allocates
+  ASSESSMENT ||--o{ PAYMENT_ALLOCATION : settles
+  ASSESSMENT ||--o{ OVERDUE_CASE : tracks
+  OVERDUE_CASE ||--o{ NOTIFICATION : informs
+  OVERDUE_CASE ||--o{ ESCALATION : assigns
+  OVERDUE_CASE ||--o{ PAYMENT_PLAN : proposes
+  PAYMENT_PLAN ||--|{ PLAN_INSTALMENT : schedules
+  OVERDUE_CASE ||--o{ WORK_ORDER : enforces
+  OVERDUE_CASE ||--o{ AUDIT_RECORD : records
+  PAYER {
+    bigint payer_id PK
+    string tin UK
+    string full_name
+  }
+  WATER_ACCOUNT {
+    string account_no PK
+    bigint payer_id FK
+    string meter_no UK
+  }
+  ASSESSMENT {
+    bigint assessment_id PK
+    bigint payer_id FK
+    string account_no FK
+    decimal amount_due
+    date due_date
+  }
+  PAYMENT {
+    uuid payment_id PK
+    bigint payer_id FK
+    string external_ref UK
+    decimal amount
+  }
+  PAYMENT_ALLOCATION {
+    uuid payment_id PK,FK
+    bigint assessment_id PK,FK
+    decimal amount
+  }
+  OVERDUE_CASE {
+    bigint case_id PK
+    bigint assessment_id FK
+    string status
+    int rule_version
+  }
+  NOTIFICATION {
+    bigint notification_id PK
+    bigint case_id FK
+    string dedupe_key UK
+    string delivery_status
+  }
+  ESCALATION {
+    bigint escalation_id PK
+    bigint case_id FK
+    string officer_id
+    int level
+  }
+  PAYMENT_PLAN {
+    bigint plan_id PK
+    bigint case_id FK
+    string proposed_by
+    string approved_by
+    string status
+  }
+  PLAN_INSTALMENT {
+    bigint instalment_id PK
+    bigint plan_id FK
+    date due_date
+    decimal amount
+  }
+  WORK_ORDER {
+    bigint order_id PK
+    bigint case_id FK
+    string type
+    string status
+    int version
+  }
+  AUDIT_RECORD {
+    bigint audit_id PK
+    bigint case_id FK
+    string actor
+    string correlation_id
+    datetime occurred_at
+  }

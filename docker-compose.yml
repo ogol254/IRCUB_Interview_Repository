@@ -1,0 +1,81 @@
+name: ircub-interview
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ircub
+      POSTGRES_USER: ircub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup.py first}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./section_01_technical/database/migrations/001_foundation.sql:/docker-entrypoint-initdb.d/001.sql:ro
+      - ./section_01_technical/database/migrations/002_reporting_penalties.sql:/docker-entrypoint-initdb.d/002.sql:ro
+      - ./section_01_technical/database/migrations/003_request_results.sql:/docker-entrypoint-initdb.d/003.sql:ro
+      - ./section_01_technical/database/migrations/004_meter_history.sql:/docker-entrypoint-initdb.d/004.sql:ro
+      - ./section_01_technical/database/seed/001_demo.sql:/docker-entrypoint-initdb.d/005.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U ircub -d ircub"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/backend.Dockerfile
+    environment: &api-environment
+      DATABASE_URL: postgresql://ircub:${POSTGRES_PASSWORD}@postgres:5432/ircub
+      REDIS_URL: redis://redis:6379/0
+      CALLBACK_SECRET: ${CALLBACK_SECRET:?Run scripts/setup.py first}
+      OFFICER_API_KEY: ${OFFICER_API_KEY:?Run scripts/setup.py first}
+      FMIS_API_KEY: ${FMIS_API_KEY:?Run scripts/setup.py first}
+      FMIS_URL: http://mock-fmis:8001
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      mock-fmis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  mock-fmis:
+    build:
+      context: .
+      dockerfile: infrastructure/backend.Dockerfile
+    command: ["uvicorn","section_01_technical.backend.mock_fmis:app","--host","0.0.0.0","--port","8001"]
+    environment:
+      <<: *api-environment
+      MOCK_FMIS_MODE: ${MOCK_FMIS_MODE:-normal}
+    ports: ["127.0.0.1:8001:8001"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  frontend:
+    build:
+      context: .
+      dockerfile: infrastructure/frontend.Dockerfile
+    ports: ["127.0.0.1:5173:80"]
+    depends_on:
+      backend: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD","wget","-q","--spider","http://localhost/"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  pgdata:

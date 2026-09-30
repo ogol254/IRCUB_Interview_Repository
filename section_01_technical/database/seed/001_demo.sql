@@ -1,0 +1,11 @@
+BEGIN;
+INSERT INTO payer(payer_id,payer_type,full_name,tin,phone,email) VALUES(1,'INDIVIDUAL','Amina Demo','TEST-001','0700000001','amina@example.test'),(2,'BUSINESS','Harbour Demo Traders','TEST-002','0700000002','harbour@example.test');
+SELECT setval(pg_get_serial_sequence('payer','payer_id'),2);
+INSERT INTO revenue_type VALUES('WATER','Water supply','WATER','4100',true),('LICENCE','Business licence','TAX','4200',true),('RETIRED','Retired demonstration levy','TAX','4300',false);
+INSERT INTO water_account VALUES('WA-001',1,'M-001','DOMESTIC','ACTIVE'),('WA-002',1,'M-002','COMMERCIAL','ACTIVE');
+INSERT INTO meter_reading(meter_no,reading_date,reading_value,reading_type) VALUES('M-001','2026-01-01',100,'ACTUAL'),('M-001','2026-02-01',110,'ACTUAL'),('M-001','2026-03-01',130,'ACTUAL'),('M-001','2026-04-01',160,'ACTUAL');
+INSERT INTO assessment(assessment_id,payer_id,revenue_code,amount_due,due_date,account_no,billing_period) VALUES(1,1,'WATER',1000,'2026-02-01','WA-001','2026-01-01'),(2,1,'WATER',2000,'2026-02-01','WA-002','2026-01-01'),(3,2,'LICENCE',5000,'2026-02-01',NULL,NULL);
+SELECT setval(pg_get_serial_sequence('assessment','assessment_id'),3);
+INSERT INTO payment VALUES('00000000-0000-0000-0000-000000000001',1,1,'WATER',100,'USD','BANK','SEED-1','2026-01-15T00:00:00Z','PENDING',NULL),('00000000-0000-0000-0000-000000000002',1,1,'WATER',200,'USD','MOBILE_MONEY','SEED-2','2026-02-15T00:00:00Z','PENDING',NULL);
+UPDATE assessment SET status='PART_PAID' WHERE assessment_id=1;
+COMMIT;
